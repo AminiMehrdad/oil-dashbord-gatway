@@ -1,0 +1,163 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayload {
+  accessToken: String!
+  message: String!
+  refreshToken: String!
+  statusCode: Float!
+  user: User!
+}
+
+input CreateUserInput {
+  company: String!
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String!
+  phone: String!
+  role: String
+}
+
+type CreatedUser {
+  message: String!
+  statusCode: Int!
+}
+
+type FildCompear {
+  name: String!
+  production: String!
+  utilize: String!
+  wells: String!
+}
+
+type LastTime {
+  date: String!
+}
+
+type Latest30Day {
+  dates: [String!]!
+  production: [Float!]!
+}
+
+type LatestData {
+  cost: Float!
+  pressure: Float!
+  production: Float!
+  temperature: Float!
+}
+
+type LogOutUser {
+  message: String!
+  statusCode: Int!
+}
+
+input LoginInput {
+  """Email address or phone number used to sign in."""
+  emailOrPhone: String!
+  password: String!
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): CreatedUser!
+  login(loginInput: LoginInput!): AuthPayload!
+  logout(refresh: String!): LogOutUser!
+}
+
+type ProductionChart {
+  datasets: [ProductionDataset!]!
+  labels: [String!]!
+}
+
+type ProductionDataset {
+  backgroundColor: String!
+  data: [Float!]!
+  label: String!
+}
+
+type Query {
+  getDate: LastTime!
+  getFildCompare(history: String!): [FildCompear!]!
+  getLast30dayName: last30DayName!
+  getLatest30day: Latest30Day!
+  getLatestData: LatestData!
+  getProductionChart(history: String!): ProductionChart!
+  getSummeryGrid(history: String!): [SummeryGrid!]!
+  getWellData(id: Int!): [WellData!]
+  getWellPage: [WellPage!]
+  getWellsData: [WellProduction!]!
+}
+
+type RealtimePayload {
+  allwells: [WellProduction!]!
+  date: LastTime!
+  latest: LatestData!
+  latest30: Latest30Day!
+  latest30name: last30DayName!
+  wellPage: [WellPage!]!
+}
+
+type Subscription {
+  latestDataUpdated: RealtimePayload!
+}
+
+type SummeryGrid {
+  change: String!
+  isPositive: Boolean!
+  label: String!
+  value: String!
+}
+
+type User {
+  avatar: String
+  createdAt: String
+  email: String!
+  ferstName: String
+  id: String
+  lastName: String
+  role: String
+  username: String
+}
+
+type WellData {
+  FLOW_KIND: String
+  chock_size: Float
+  chocke_pressure: Float
+  data: String
+  gas: Float
+  hover_open: Float
+  id: Int
+  oil: Float
+  pressure_down: Float
+  pressure_top: Float
+  temperature_down: Float
+  temprature_top: Float
+  water: Float
+  water_i: Float
+  well_id: Int
+  well_name: String
+}
+
+type WellPage {
+  hour: String
+  location: String!
+  name: String!
+  oil: String
+  pressure: String
+  temperature: String
+  type: String!
+}
+
+type WellProduction {
+  location: String!
+  pressure: Float
+  production: Float
+  satatus: String!
+  well_id: String!
+}
+
+type last30DayName {
+  production: [Float!]!
+  well_name: [String!]!
+}

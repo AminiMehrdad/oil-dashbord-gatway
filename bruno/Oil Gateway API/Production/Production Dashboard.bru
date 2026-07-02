@@ -1,0 +1,46 @@
+meta {
+  name: Production Dashboard
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query ProductionDashboard($history: String!) {
+    getSummeryGrid(history: $history) {
+      label
+      value
+      change
+      isPositive
+    }
+    getProductionChart(history: $history) {
+      labels
+      datasets {
+        label
+        data
+        backgroundColor
+      }
+    }
+    getFildCompare(history: $history) {
+      name
+      production
+      wells
+      utilize
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "history": "30d"
+  }
+}

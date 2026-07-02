@@ -1,0 +1,28 @@
+meta {
+  name: Thirty Day Charts
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query ThirtyDayCharts {
+    getLatest30day {
+      dates
+      production
+    }
+    getLast30dayName {
+      well_name
+      production
+    }
+  }
+}

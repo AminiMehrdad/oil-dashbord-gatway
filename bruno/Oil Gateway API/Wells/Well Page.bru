@@ -1,0 +1,36 @@
+meta {
+  name: Well Page
+  type: graphql
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query WellPage {
+    getWellPage {
+      name
+      type
+      location
+      oil
+      pressure
+      temperature
+      hour
+    }
+    getWellsData {
+      well_id
+      location
+      satatus
+      production
+      pressure
+    }
+  }
+}

@@ -1,0 +1,44 @@
+meta {
+  name: Well Data By Id
+  type: graphql
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/graphql
+  body: graphql
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{accessToken}}
+}
+
+body:graphql {
+  query WellData($id: Int!) {
+    getWellData(id: $id) {
+      id
+      data
+      well_name
+      hover_open
+      pressure_down
+      temperature_down
+      chock_size
+      pressure_top
+      temprature_top
+      chocke_pressure
+      oil
+      gas
+      water
+      water_i
+      FLOW_KIND
+      well_id
+    }
+  }
+}
+
+body:graphql:vars {
+  {
+    "id": 1
+  }
+}
