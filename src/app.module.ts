@@ -6,7 +6,6 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 
-import { ClientsModule, Transport } from '@nestjs/microservices';
 import { DataResolver } from './resolvers/data.resolver';
 import { WellService } from './services/data.service';
 import { RabbitMQService } from './services/rabbitmq.service';
@@ -22,10 +21,8 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
 
 @Module({
   imports: [
-    //global .env file
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
 
-    // config graphql
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -33,11 +30,9 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
         "graphql-ws": true
       },
       context: ({ req, request, connectionParams }) => {
-        // Handle both Express (req) and Fastify (request)
         const actualRequest = req || request;
         return { req: actualRequest ?? { headers: connectionParams ?? {} } };
       },
-      
       sortSchema: true,
       playground: true,
     }),
