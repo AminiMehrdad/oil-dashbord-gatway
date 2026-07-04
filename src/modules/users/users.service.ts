@@ -1,10 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { User, UserDocument } from './entity/user.schema';
-import { CreateUserInput } from './types/create-user.input';
-import { UpdateUserInput } from './types/update-user.input';
-import { UserModel } from './types/user.model';
+import { User, UserDocument } from './schemas/user.schema';
+import { CreateUserInput } from './inputs/create-user.input';
+import { UpdateUserInput } from './inputs/update-user.input';
+import { UserModel } from './outputs/user.model';
 
 type UserRecord = User & {
   _id: { toString: () => string };

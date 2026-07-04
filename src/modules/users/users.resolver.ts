@@ -1,8 +1,8 @@
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UsersService } from './users.service';
-import { UserModel } from './types/user.model';
-import { CreateUserInput } from './types/create-user.input';
-import { UpdateUserInput } from './types/update-user.input';
+import { UserModel } from './outputs/user.model';
+import { CreateUserInput } from './inputs/create-user.input';
+import { UpdateUserInput } from './inputs/update-user.input';
 import { normalizeServiceError } from 'src/common/utils/http-error.util';
 
 @Resolver(() => UserModel)
