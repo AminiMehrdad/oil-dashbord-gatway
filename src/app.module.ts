@@ -1,23 +1,29 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
-
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 
-import { DataResolver } from './resolvers/data.resolver';
-import { WellService } from './services/data.service';
-import { RabbitMQService } from './services/rabbitmq.service';
-import { RealtimeService } from './services/realtime.service';
-import { WellPageResolver } from './resolvers/wellsPage.resolver';
-import { ProductionPageResolver } from './resolvers/productionPage.resolver';
-import { ProductionService } from './services/production.service';
-import { AuthResolver } from './resolvers/auth.resolver';
-import { AuthService } from './services/auth.service';
-import { GqlAuthGuard } from './auth/guards/gql-auth.guard';
-import { AuthErrorInterceptor } from './auth/interceptors/auth-error.interceptor';
-import { LoggingInterceptor } from './interceptors/logging.interceptor';
+// import { GqlAuthGuard } from './common/guards/gql-auth.guard';
+import { AuthErrorInterceptor } from './common/interceptors/auth-error.interceptor';
+import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
+import { AuthModule } from './modules/auth/auth.module';
+import { ProductionModule } from './modules/production/production.module';
+import { UsersModule } from './modules/users/users.module';
+import { WellsModule } from './modules/wells/wells.module';
+import { MongodbModule } from './shared/mongodb/mongodb.module';
+import { RedisModule } from './shared/redis/redis.module';
+
+type GraphQLContextRequest = {
+  headers?: Record<string, unknown>;
+};
+
+type GraphQLContextFactoryInput = {
+  req?: GraphQLContextRequest;
+  request?: GraphQLContextRequest;
+  connectionParams?: Record<string, unknown>;
+};
 
 @Module({
   imports: [
@@ -27,41 +33,40 @@ import { LoggingInterceptor } from './interceptors/logging.interceptor';
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       subscriptions: {
-        "graphql-ws": true
+        'graphql-ws': true,
       },
-      context: ({ req, request, connectionParams }) => {
+      context: ({
+        req,
+        request,
+        connectionParams,
+      }: GraphQLContextFactoryInput) => {
         const actualRequest = req || request;
         return { req: actualRequest ?? { headers: connectionParams ?? {} } };
       },
       sortSchema: true,
       playground: true,
     }),
+    MongodbModule,
+    RedisModule,
+    AuthModule,
+    UsersModule,
+    WellsModule,
+    ProductionModule,
   ],
 
-  providers:
-    [
-      DataResolver,
-      WellPageResolver,
-      ProductionPageResolver,
-      AuthResolver,
-
-      WellService,
-      RabbitMQService,
-      RealtimeService,
-      ProductionService,
-      AuthService,
-      {
-        provide: APP_GUARD,
-        useClass: GqlAuthGuard,
-      },
-      {
-        provide: APP_INTERCEPTOR,
-        useClass: AuthErrorInterceptor,
-      },
-      {
-        provide: APP_INTERCEPTOR,
-        useClass: LoggingInterceptor,
-      },
-    ],
+  providers: [
+    // {
+    //   provide: APP_GUARD,
+    //   useClass: GqlAuthGuard,
+    // },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: AuthErrorInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: LoggingInterceptor,
+    },
+  ],
 })
-export class AppModule { }
+export class AppModule {}

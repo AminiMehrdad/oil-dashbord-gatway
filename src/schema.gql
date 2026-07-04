@@ -11,19 +11,25 @@ type AuthPayload {
 }
 
 input CreateUserInput {
-  company: String!
+  companyname: String
   email: String!
-  firstName: String!
-  lastName: String!
+  firstname: String!
+  imageLink: String
+  jobtitle: String
+  lastname: String!
   password: String!
-  phone: String!
-  role: String
+  phonenumber: String!
 }
 
 type CreatedUser {
   message: String!
   statusCode: Int!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type FildCompear {
   name: String!
@@ -60,9 +66,11 @@ input LoginInput {
 }
 
 type Mutation {
-  createUser(createUserInput: CreateUserInput!): CreatedUser!
+  createUser(createUserInput: CreateUserInput!): UserProfile!
+  deleteUser(id: ID!): Boolean!
   login(loginInput: LoginInput!): AuthPayload!
   logout(refresh: String!): LogOutUser!
+  updateUser(id: ID!, updateUserInput: UpdateUserInput!): UserProfile!
 }
 
 type ProductionChart {
@@ -87,6 +95,8 @@ type Query {
   getWellData(id: Int!): [WellData!]
   getWellPage: [WellPage!]
   getWellsData: [WellProduction!]!
+  user(id: ID!): UserProfile!
+  users: [UserProfile!]!
 }
 
 type RealtimePayload {
@@ -109,6 +119,17 @@ type SummeryGrid {
   value: String!
 }
 
+input UpdateUserInput {
+  companyname: String
+  email: String
+  firstname: String
+  imageLink: String
+  jobtitle: String
+  lastname: String
+  password: String
+  phonenumber: String
+}
+
 type User {
   avatar: String
   createdAt: String
@@ -118,6 +139,20 @@ type User {
   lastName: String
   role: String
   username: String
+}
+
+type UserProfile {
+  _id: ID!
+  companyname: String
+  createdAt: DateTime!
+  email: String!
+  firstname: String!
+  imageLink: String
+  jobtitle: String
+  lastname: String!
+  password: String!
+  phonenumber: String!
+  updatedAt: DateTime!
 }
 
 type WellData {
