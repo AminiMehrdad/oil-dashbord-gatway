@@ -1,5 +1,5 @@
 import { Args, Resolver, Query, Int, Subscription } from '@nestjs/graphql';
-import { pubSub } from 'src/common/rabbit/pubsub.service';
+import { pubSub } from 'src/shared/rabbit/pubsub.service';
 import { LatestData } from '../types/latest-data.model';
 import { WellService } from '../services/well.service';
 import { WellProduction } from '../types/all-wells.model';

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RabbitMQService } from 'src/common/rabbit/rabbitmq.service';
+import { RabbitMQService } from 'src/shared/rabbit/rabbitmq.service';
 import { FildCompear } from '../types/fildCompear.model';
 import { ProductionChart } from '../types/productionChard.model';
 import { SummeryGrid } from '../types/summeryGrid.model';

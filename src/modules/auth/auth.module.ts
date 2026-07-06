@@ -1,23 +1,23 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-
-import { RabbitModule } from 'src/common/rabbit/rabbit.module';
 import { RedisModule } from 'src/shared/redis/redis.module';
+import { UsersModule } from '../users/users.module';
+import { AuthRepository } from './auth.repo';
+import { AuthResolver } from './auth.resolver';
+import { AuthService } from './auth.service';
 import {
   AuthRefreshToken,
   AuthRefreshTokenSchema,
-} from './entity/auth-refresh-token.schema';
-import { AuthResolver } from './resolvers/auth.resolver';
-import { AuthService } from './services/auth.service';
+} from './schemas/auth.schema';
 
 @Module({
   imports: [
-    RabbitModule,
+    UsersModule,
     RedisModule,
     MongooseModule.forFeature([
       { name: AuthRefreshToken.name, schema: AuthRefreshTokenSchema },
     ]),
   ],
-  providers: [AuthResolver, AuthService],
+  providers: [AuthResolver, AuthService, AuthRepository],
 })
 export class AuthModule {}

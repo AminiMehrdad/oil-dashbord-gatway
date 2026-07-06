@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { RabbitModule } from 'src/common/rabbit/rabbit.module';
+import { RabbitModule } from 'src/shared/rabbit/rabbit.module';
 import { WellDataGateway } from './gateways/well-data.gateway';
 import { DataResolver } from './resolvers/data.resolver';
 import { WellPageResolver } from './resolvers/wells-page.resolver';

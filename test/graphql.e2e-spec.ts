@@ -8,7 +8,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { join } from 'path';
 import request from 'supertest';
-import { AuthResolver } from '../src/modules/auth/resolvers/auth.resolver';
+import { AuthResolver } from '../src/modules/auth/auth.resolver';
 import { AuthService } from '../src/modules/auth/services/auth.service';
 import { ProductionPageResolver } from '../src/modules/production/resolvers/production-page.resolver';
 import { ProductionService } from '../src/modules/production/services/production.service';

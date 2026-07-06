@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
 
-// import { GqlAuthGuard } from './common/guards/gql-auth.guard';
+import { GraphqlExceptionFilter } from './common/filters/graphql-exception.filter';
+import { GqlAuthGuard } from './common/guards/gql-auth.guard';
 import { AuthErrorInterceptor } from './common/interceptors/auth-error.interceptor';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 import { AuthModule } from './modules/auth/auth.module';
@@ -55,10 +56,14 @@ type GraphQLContextFactoryInput = {
   ],
 
   providers: [
-    // {
-    //   provide: APP_GUARD,
-    //   useClass: GqlAuthGuard,
-    // },
+    {
+      provide: APP_GUARD,
+      useClass: GqlAuthGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GraphqlExceptionFilter,
+    },
     {
       provide: APP_INTERCEPTOR,
       useClass: AuthErrorInterceptor,

@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 
 @ObjectType()
-export class CreatedUser {
+export class RegisterOutput {
   @Field(() => Int)
   statusCode: number;
 

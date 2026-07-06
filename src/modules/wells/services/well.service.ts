@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { RabbitMQService } from 'src/common/rabbit/rabbitmq.service';
+import { RabbitMQService } from 'src/shared/rabbit/rabbitmq.service';
 import { WellProduction } from '../types/all-wells.model';
 import { last30DayName } from '../types/last-30-day-name.model';
 import { LastTime } from '../types/last-time.model';

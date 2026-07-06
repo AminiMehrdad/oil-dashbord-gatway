@@ -5,13 +5,12 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  IsUrl,
   MinLength,
 } from 'class-validator';
-import { JobRole, UserRole } from '../schemas/user.schema';
+import { JobRole, UserRole } from 'src/modules/users/schemas/user.schema';
 
 @InputType()
-export class CreateUserInput {
+export class RegisterInput {
   @Field()
   @IsString()
   @IsNotEmpty({ message: 'First name is required' })
@@ -33,11 +32,6 @@ export class CreateUserInput {
 
   @Field()
   @IsString()
-  @MinLength(6, { message: 'Password must be at least 6 characters long' })
-  password: string;
-
-  @Field()
-  @IsString()
   @IsNotEmpty({ message: 'Company is required' })
   company: string;
 
@@ -48,11 +42,10 @@ export class CreateUserInput {
   })
   jobRole: JobRole;
 
-  @Field({ nullable: true })
-  @IsOptional()
+  @Field()
   @IsString()
-  @IsUrl({}, { message: 'Image link must be a valid URL' })
-  imageLink?: string;
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  password: string;
 
   @Field(() => UserRole, { nullable: true })
   @IsOptional()

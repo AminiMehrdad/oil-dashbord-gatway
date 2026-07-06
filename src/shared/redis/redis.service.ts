@@ -5,6 +5,7 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { createHash } from 'crypto';
 import { createClient, RedisClientType } from 'redis';
 
 @Injectable()
@@ -50,6 +51,54 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     });
   }
 
+  async setAccessToken(
+    accessToken: string,
+    payload: unknown,
+    ttlSeconds?: number,
+  ): Promise<void> {
+    const ttl =
+      ttlSeconds ?? this.config.get<number>('ACCESS_TOKEN_TTL_SECONDS') ?? 900;
+
+    await this.client.set(
+      this.getAccessTokenKey(accessToken),
+      JSON.stringify(payload),
+      {
+        EX: ttl,
+      },
+    );
+
+    const userId = this.getPayloadUserId(payload);
+    if (userId) {
+      await this.client.set(this.getUserAccessTokenKey(userId), accessToken, {
+        EX: ttl,
+      });
+    }
+  }
+
+  async getAccessTokenPayload<T>(accessToken: string): Promise<T | null> {
+    const payload = await this.client.get(this.getAccessTokenKey(accessToken));
+
+    if (!payload) {
+      return null;
+    }
+
+    return JSON.parse(payload) as T;
+  }
+
+  async deleteAccessToken(accessToken: string): Promise<void> {
+    await this.client.del(this.getAccessTokenKey(accessToken));
+  }
+
+  async deleteAccessTokenByUserId(userId: string): Promise<void> {
+    const accessToken = await this.client.get(this.getUserAccessTokenKey(userId));
+
+    if (accessToken) {
+      await this.deleteAccessToken(accessToken);
+    }
+
+    await this.client.del(this.getUserAccessTokenKey(userId));
+  }
+
   async getRefreshToken(userId: string): Promise<string | null> {
     return this.client.get(this.getRefreshTokenKey(userId));
   }
@@ -73,5 +122,30 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   private getRefreshTokenKey(userId: string): string {
     return `auth:refresh-token:${userId}`;
+  }
+
+  private getAccessTokenKey(accessToken: string): string {
+    return `auth:access-token:${this.hashToken(accessToken)}`;
+  }
+
+  private getUserAccessTokenKey(userId: string): string {
+    return `auth:user-access-token:${userId}`;
+  }
+
+  private getPayloadUserId(payload: unknown): string | null {
+    if (
+      typeof payload === 'object' &&
+      payload !== null &&
+      'id' in payload &&
+      typeof payload.id === 'string'
+    ) {
+      return payload.id;
+    }
+
+    return null;
+  }
+
+  private hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
   }
 }

@@ -1,12 +1,12 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { User, UserDocument } from './schemas/user.schema';
+import { Injectable } from '@nestjs/common';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
-import { UserModel } from './outputs/user.model';
+import { DeleteUserOutput } from './outputs/delete-user.output';
+import { UserOutput } from './outputs/user.output';
+import { UserDocument } from './schemas/user.schema';
+import { UsersRepository } from './users.repo';
 
-type UserRecord = User & {
+type UserObject = Omit<UserDocument, 'toObject'> & {
   _id: { toString: () => string };
   createdAt: Date;
   updatedAt: Date;
@@ -14,63 +14,49 @@ type UserRecord = User & {
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User.name) private readonly userModel: Model<UserDocument>,
-  ) {}
+  constructor(private readonly usersRepository: UsersRepository) {}
 
-  async create(createUserInput: CreateUserInput): Promise<UserModel> {
-    const created = await this.userModel.create(createUserInput);
-    return this.toUserModel(created.toObject() as unknown as UserRecord);
+  async create(input: CreateUserInput): Promise<UserOutput> {
+    const user = await this.usersRepository.create(input);
+    return this.toUserOutput(user);
   }
 
-  async findAll(): Promise<UserModel[]> {
-    const users = await this.userModel.find().lean<UserRecord[]>().exec();
-    return users.map((user) => this.toUserModel(user));
+  async findAll(): Promise<UserOutput[]> {
+    const users = await this.usersRepository.findAll();
+    return users.map((user) => this.toUserOutput(user));
   }
 
-  async findOne(id: string): Promise<UserModel> {
-    const user = await this.userModel.findById(id).lean<UserRecord>().exec();
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
-    return this.toUserModel(user);
+  async findOne(id: string): Promise<UserOutput> {
+    const user = await this.usersRepository.findById(id);
+    return this.toUserOutput(user);
   }
 
-  async update(
-    id: string,
-    updateUserInput: UpdateUserInput,
-  ): Promise<UserModel> {
-    const updated = await this.userModel
-      .findByIdAndUpdate(id, updateUserInput, { new: true })
-      .lean<UserRecord>()
-      .exec();
-
-    if (!updated) {
-      throw new NotFoundException('User not found');
-    }
-
-    return this.toUserModel(updated);
+  async update(id: string, input: UpdateUserInput): Promise<UserOutput> {
+    const user = await this.usersRepository.update(id, input);
+    return this.toUserOutput(user);
   }
 
-  async remove(id: string): Promise<boolean> {
-    const deleted = await this.userModel.findByIdAndDelete(id).exec();
-    if (!deleted) {
-      throw new NotFoundException('User not found');
-    }
-    return true;
+  async remove(id: string): Promise<DeleteUserOutput> {
+    await this.usersRepository.delete(id);
+    return {
+      success: true,
+      message: 'User deleted successfully',
+    };
   }
 
-  private toUserModel(user: UserRecord): UserModel {
+  private toUserOutput(document: UserDocument): UserOutput {
+    const user = document.toObject() as UserObject;
+
     return {
       _id: user._id.toString(),
-      firstname: user.firstname,
-      lastname: user.lastname,
-      phonenumber: user.phonenumber,
+      firstName: user.firstName,
+      lastName: user.lastName,
       email: user.email,
-      password: user.password,
-      companyname: user.companyname,
-      jobtitle: user.jobtitle,
+      phone: user.phone,
+      company: user.company,
+      jobRole: user.jobRole,
       imageLink: user.imageLink,
+      role: user.role,
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
