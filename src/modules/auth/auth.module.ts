@@ -5,6 +5,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthRepository } from './auth.repo';
 import { AuthResolver } from './auth.resolver';
 import { AuthService } from './auth.service';
+import { RefreshTokenGuard } from '../../common/guards/refresh-token.guard';
 import {
   AuthRefreshToken,
   AuthRefreshTokenSchema,
@@ -18,6 +19,7 @@ import {
       { name: AuthRefreshToken.name, schema: AuthRefreshTokenSchema },
     ]),
   ],
-  providers: [AuthResolver, AuthService, AuthRepository],
+  providers: [AuthResolver, AuthService, AuthRepository, RefreshTokenGuard],
+  exports: [AuthRepository, RefreshTokenGuard],
 })
 export class AuthModule {}

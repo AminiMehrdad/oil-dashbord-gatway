@@ -43,7 +43,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   ): Promise<void> {
     const ttl =
       ttlSeconds ??
-      this.config.get<number>('REFRESH_TOKEN_TTL_SECONDS') ??
+      this.getNumberConfig('REFRESH_TOKEN_TTL_SECONDS') ??
       7 * 24 * 60 * 60;
 
     await this.client.set(this.getRefreshTokenKey(userId), refreshToken, {
@@ -57,7 +57,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
     ttlSeconds?: number,
   ): Promise<void> {
     const ttl =
-      ttlSeconds ?? this.config.get<number>('ACCESS_TOKEN_TTL_SECONDS') ?? 900;
+      ttlSeconds ?? this.getNumberConfig('ACCESS_TOKEN_TTL_SECONDS') ?? 900;
 
     await this.client.set(
       this.getAccessTokenKey(accessToken),
@@ -147,5 +147,13 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
 
   private hashToken(token: string): string {
     return createHash('sha256').update(token).digest('hex');
+  }
+
+  private getNumberConfig(key: string): number | undefined {
+    const value = this.config.get<string | number>(key);
+    const parsedValue =
+      typeof value === 'number' ? value : Number.parseInt(value ?? '', 10);
+
+    return Number.isFinite(parsedValue) ? parsedValue : undefined;
   }
 }

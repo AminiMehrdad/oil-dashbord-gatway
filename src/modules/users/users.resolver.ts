@@ -4,22 +4,27 @@ import { UpdateUserInput } from './inputs/update-user.input';
 import { DeleteUserOutput } from './outputs/delete-user.output';
 import { UserOutput } from './outputs/user.output';
 import { UsersService } from './users.service';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { UserRole } from './schemas/user.schema';
 
 @Resolver(() => UserOutput)
 export class UsersResolver {
   constructor(private readonly usersService: UsersService) { }
 
   @Query(() => [UserOutput])
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async users(): Promise<UserOutput[]> {
     return await this.usersService.findAll();
   }
 
   @Query(() => UserOutput)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async user(@Args('id', { type: () => ID }) id: string): Promise<UserOutput> {
     return await this.usersService.findOne(id);
   }
 
   @Mutation(() => UserOutput)
+  @Roles(UserRole.ADMIN)
   async createUser(
     @Args('createUserInput') createUserInput: CreateUserInput,
   ): Promise<UserOutput> {
@@ -27,6 +32,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => UserOutput)
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async updateUser(
     @Args('id', { type: () => ID }) id: string,
     @Args('updateUserInput') updateUserInput: UpdateUserInput,
@@ -35,6 +41,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => DeleteUserOutput)
+  @Roles(UserRole.ADMIN)
   async deleteUser(
     @Args('id', { type: () => ID }) id: string,
   ): Promise<DeleteUserOutput> {

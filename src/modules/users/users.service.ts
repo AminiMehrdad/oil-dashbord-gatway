@@ -5,6 +5,8 @@ import { DeleteUserOutput } from './outputs/delete-user.output';
 import { UserOutput } from './outputs/user.output';
 import { UserDocument } from './schemas/user.schema';
 import { UsersRepository } from './users.repo';
+import { EmailAlreadyExistsException } from 'src/common/exceptions/register-erros/email-already-exists.exception';
+import { PhoneAlreadyExistsException } from 'src/common/exceptions/register-erros/phone-already-exists.exception';
 
 type UserObject = Omit<UserDocument, 'toObject'> & {
   _id: { toString: () => string };
@@ -17,6 +19,16 @@ export class UsersService {
   constructor(private readonly usersRepository: UsersRepository) {}
 
   async create(input: CreateUserInput): Promise<UserOutput> {
+    const user_email = await this.usersRepository.findByEmail(input.email);
+    if( user_email ) {
+      throw new EmailAlreadyExistsException(input.email)
+    }
+
+    const user_phone = await this.usersRepository.findByPhone(input.phone);
+    if(user_phone) {
+      throw new PhoneAlreadyExistsException(input.phone)
+    }
+
     const user = await this.usersRepository.create(input);
     return this.toUserOutput(user);
   }

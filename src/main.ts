@@ -7,8 +7,8 @@ import {
 } from '@nestjs/platform-fastify';
 import fastifyCors from '@fastify/cors';
 
-import { Logger, ValidationPipe } from '@nestjs/common';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
+import { Logger } from '@nestjs/common';
+import { CustomValidationPipe } from './common/pipes/validation.pipe';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -21,15 +21,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.useGlobalFilters(new AllExceptionsFilter());
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
-      transform: true,
-      stopAtFirstError: true,
-    })
-  );
+  app.useGlobalPipes(new CustomValidationPipe());
 
   await app.listen(
     process.env.PORT ? Number(process.env.PORT) : 5000,

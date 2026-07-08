@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { createHash, randomBytes, scrypt } from 'crypto';
 import { promisify } from 'util';
 import * as jwt from 'jsonwebtoken';
-import { InvalidCredentialsException } from 'src/common/exceptions/register-erros/invalid-credentials.exception';
+import { InvalidCredentialsException } from '../../common/exceptions/custom.exception';
 import { RedisService } from 'src/shared/redis/redis.service';
 import { UsersRepository } from '../users/users.repo';
 import { UserOutput } from '../users/outputs/user.output';
@@ -79,18 +79,21 @@ export class AuthService {
       this.getRefreshTokenTtlSeconds(),
     );
 
-    await this.redis.setAccessToken(accessToken, {
-      id: userId,
-      email: user.email,
-      role: user.role,
-    });
+    await this.redis.setAccessToken(
+      accessToken,
+      {
+        id: userId,
+        email: user.email,
+        role: user.role,
+      },
+      this.getAccessTokenTtlSeconds(),
+    );
     await this.authRepository.upsertActiveToken({
       userId,
       refreshTokenHash: this.hashToken(refreshToken),
       expiresAt: new Date(Date.now() + this.getRefreshTokenTtlSeconds() * 1000),
       revoked: false,
     });
-    await this.redis.setRefreshToken(userId, refreshToken, this.getRefreshTokenTtlSeconds());
 
     return {
       accessToken,
@@ -182,12 +185,16 @@ export class AuthService {
       expiresAt: new Date(Date.now() + this.getRefreshTokenTtlSeconds() * 1000),
       revoked: false,
     });
-    await this.redis.setAccessToken(newAccessToken, {
-      id: userId,
-      email: user.email,
-      role: user.role,
-    });
-    await this.redis.setRefreshToken(userId, newRefreshToken, this.getRefreshTokenTtlSeconds());
+    await this.redis.deleteAccessTokenByUserId(userId);
+    await this.redis.setAccessToken(
+      newAccessToken,
+      {
+        id: userId,
+        email: user.email,
+        role: user.role,
+      },
+      this.getAccessTokenTtlSeconds(),
+    );
 
     return {
       accessToken: newAccessToken,
@@ -269,10 +276,21 @@ export class AuthService {
   }
 
   private getAccessTokenTtlSeconds(): number {
-    return this.config.get<number>('ACCESS_TOKEN_TTL_SECONDS') ?? 900;
+    return this.getNumberConfig('ACCESS_TOKEN_TTL_SECONDS', 900);
   }
 
   private getRefreshTokenTtlSeconds(): number {
-    return this.config.get<number>('REFRESH_TOKEN_TTL_SECONDS') ?? 7 * 24 * 60 * 60;
+    return this.getNumberConfig(
+      'REFRESH_TOKEN_TTL_SECONDS',
+      7 * 24 * 60 * 60,
+    );
+  }
+
+  private getNumberConfig(key: string, fallback: number): number {
+    const value = this.config.get<string | number>(key);
+    const parsedValue =
+      typeof value === 'number' ? value : Number.parseInt(value ?? '', 10);
+
+    return Number.isFinite(parsedValue) ? parsedValue : fallback;
   }
 }

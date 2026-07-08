@@ -15,7 +15,7 @@ export class UsersRepository {
 
   async create(input: CreateUserInput): Promise<UserDocument> {
     try {
-      return this.userModel.create(this.normalizeCreateInput(input));
+      return await this.userModel.create(this.normalizeCreateInput(input));
     } catch (error) {
       throw new DatabaseException()
     }
@@ -44,6 +44,9 @@ export class UsersRepository {
 
       return user;
     } catch (error) {
+      if (error instanceof UserNotFoundException) {
+        throw error;
+      }
       throw new DatabaseException()
     }
   }
@@ -84,6 +87,9 @@ export class UsersRepository {
       }
       return user;
     } catch (error) {
+      if (error instanceof UserNotFoundException) {
+        throw error;
+      }
       throw new DatabaseException();
     }
   }
@@ -97,6 +103,9 @@ export class UsersRepository {
         throw new UserNotFoundException();
       }
     } catch (error) {
+      if (error instanceof UserNotFoundException) {
+        throw error;
+      }
       throw new DatabaseException();
     }
   }

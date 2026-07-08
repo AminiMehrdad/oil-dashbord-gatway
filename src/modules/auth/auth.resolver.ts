@@ -1,15 +1,13 @@
+import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { AuthPayload } from './types/auth-payload.model';
 import { LoginInput } from './types/login.input';
-import {
-  normalizeServiceError,
-  throwIfErrorResponse,
-} from 'src/common/utils/http-error.util';
 import { LogOutUser } from './types/logout-user.output';
 import { RegisterInput } from './inputs/register.input';
 import { UserOutput } from '../users/outputs/user.output';
-import { Public } from './decorators/public.decorator';
+import { Public } from '../../common/decorators/public.decorator';
+import { RefreshTokenGuard } from '../../common/guards/refresh-token.guard';
 
 @Resolver()
 export class AuthResolver {
@@ -28,40 +26,24 @@ export class AuthResolver {
   async login(
     @Args('loginInput') loginInput: LoginInput,
   ): Promise<AuthPayload> {
-    try {
-      const response = await this.authService.login(loginInput);
-      throwIfErrorResponse(response);
-      return response;
-    } catch (error) {
-      normalizeServiceError(error);
-    }
+    return this.authService.login(loginInput);
   }
 
   @Mutation(() => LogOutUser)
   @Public()
+  @UseGuards(RefreshTokenGuard)
   async logout(
     @Args('refreshToken', { type: () => String }) refreshToken: string,
   ): Promise<LogOutUser> {
-    try {
-      const response = await this.authService.logout(refreshToken);
-      throwIfErrorResponse(response);
-      return response;
-    } catch (error) {
-      normalizeServiceError(error);
-    }
+    return this.authService.logout(refreshToken);
   }
 
   @Mutation(() => AuthPayload)
   @Public()
+  @UseGuards(RefreshTokenGuard)
   async refreshToken(
     @Args('refreshToken', { type: () => String }) refreshToken: string,
   ): Promise<AuthPayload> {
-    try {
-      const response = await this.authService.refreshToken(refreshToken);
-      throwIfErrorResponse(response);
-      return response;
-    } catch (error) {
-      normalizeServiceError(error);
-    }
+    return this.authService.refreshToken(refreshToken);
   }
 }

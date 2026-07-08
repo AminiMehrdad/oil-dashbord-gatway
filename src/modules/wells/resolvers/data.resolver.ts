@@ -8,6 +8,8 @@ import { LastTime } from '../types/last-time.model';
 import { Latest30Day } from '../types/latest-30-day.model';
 import { RealtimePayload } from '../types/realtime-data.model';
 import { WellData } from '../types/well-data.model';
+import { Roles } from '../../../common/decorators/roles.decorator';
+import { UserRole } from '../../users/schemas/user.schema';
 
 @Resolver()
 export class DataResolver {
@@ -53,7 +55,7 @@ export class DataResolver {
   }
 
   @Query(() => [WellProduction])
-  // @Roles("admin")
+  @Roles(UserRole.ADMIN, UserRole.MANAGER)
   async getWellsData(): Promise<WellProduction> {
     const answer = await this.wellService.getWellsData();
     return answer;
