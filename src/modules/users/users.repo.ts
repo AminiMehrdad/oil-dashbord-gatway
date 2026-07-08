@@ -4,8 +4,8 @@ import { Model, Types, UpdateQuery } from 'mongoose';
 import { CreateUserInput } from './inputs/create-user.input';
 import { UpdateUserInput } from './inputs/update-user.input';
 import { User, UserDocument } from './schemas/user.schema';
-import { UserNotFoundException } from 'src/common/exceptions/user-not-found.exception';
-import { DatabaseException } from 'src/common/exceptions/database.exception';
+import { UserNotFoundException } from 'src/common/exceptions/custom.exception';
+import { DatabaseException } from 'src/common/exceptions/custom.exception';
 
 @Injectable()
 export class UsersRepository {

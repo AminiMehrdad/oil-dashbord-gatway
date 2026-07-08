@@ -76,3 +76,13 @@ export class ValidationException extends CustomException {
   }
 }
 
+export class UserNotFoundException extends CustomException {
+  constructor() {
+    super(
+      `User not found`,
+      HttpStatus.NOT_FOUND,
+      'USER_NOT_FOUND',
+    );
+  }
+}
+

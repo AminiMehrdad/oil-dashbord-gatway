@@ -5,8 +5,8 @@ import { DeleteUserOutput } from './outputs/delete-user.output';
 import { UserOutput } from './outputs/user.output';
 import { UserDocument } from './schemas/user.schema';
 import { UsersRepository } from './users.repo';
-import { EmailAlreadyExistsException } from 'src/common/exceptions/register-erros/email-already-exists.exception';
-import { PhoneAlreadyExistsException } from 'src/common/exceptions/register-erros/phone-already-exists.exception';
+import { EmailAlreadyExistsException } from 'src/common/exceptions/custom.exception';
+import { PhoneAlreadyExistsException } from 'src/common/exceptions/custom.exception';
 
 type UserObject = Omit<UserDocument, 'toObject'> & {
   _id: { toString: () => string };

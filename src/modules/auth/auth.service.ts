@@ -10,9 +10,9 @@ import { UserOutput } from '../users/outputs/user.output';
 import { UsersService } from '../users/users.service';
 import { RegisterInput } from './inputs/register.input';
 import { AuthRepository } from './auth.repo';
-import { AuthPayload } from './types/auth-payload.model';
-import { LoginInput } from './types/login.input';
-import { LogOutUser } from './types/logout-user.output';
+import { LoginOutput } from './outputs/login.output';
+import { LoginInput } from './inputs/login.input';
+import { LogOutUser } from './outputs/logout.output';
 
 const scryptAsync = promisify(scrypt);
 
@@ -42,7 +42,7 @@ export class AuthService {
     });
   }
 
-  async login(loginInput: LoginInput): Promise<AuthPayload> {
+  async login(loginInput: LoginInput): Promise<LoginOutput> {
     const user = await this.findUserByEmailOrPhone(loginInput.emailOrPhone);
 
     if (!user) {
@@ -102,9 +102,10 @@ export class AuthService {
         id: userId,
         email: user.email,
         role: user.role,
-        ferstName: user.firstName,
+        firstName: user.firstName,
         lastName: user.lastName,
         createdAt: user.createdAt?.toISOString(),
+        imageLink: user.imageLink,
       },
       statusCode: 200,
       message: 'Login successful',
@@ -133,7 +134,7 @@ export class AuthService {
     };
   }
 
-  async refreshToken(refreshToken: string): Promise<AuthPayload> {
+  async refreshToken(refreshToken: string): Promise<LoginOutput> {
     if (!refreshToken) {
       throw new UnauthorizedException('Refresh token is required');
     }
@@ -203,9 +204,10 @@ export class AuthService {
         id: userId,
         email: user.email,
         role: user.role,
-        ferstName: user.firstName,
+        firstName: user.firstName,
         lastName: user.lastName,
         createdAt: user.createdAt?.toISOString(),
+        imageLink: user.imageLink,
       },
       statusCode: 200,
       message: 'Token refreshed successfully',

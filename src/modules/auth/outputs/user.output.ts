@@ -13,11 +13,14 @@ export class AuthUser {
   role: UserRole;
 
   @Field({ nullable: true })
-  ferstName?: string;
+  firstName?: string;
 
   @Field({ nullable: true })
   lastName?: string;
 
   @Field({ nullable: true })
   createdAt?: string;
+
+  @Field({ nullable: true })
+  imageLink?: string;
 }

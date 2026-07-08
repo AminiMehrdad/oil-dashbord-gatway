@@ -1,9 +1,9 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
-import { AuthPayload } from './types/auth-payload.model';
-import { LoginInput } from './types/login.input';
-import { LogOutUser } from './types/logout-user.output';
+import { LoginOutput } from './outputs/login.output';
+import { LoginInput } from './inputs/login.input';
+import { LogOutUser } from './outputs/logout.output';
 import { RegisterInput } from './inputs/register.input';
 import { UserOutput } from '../users/outputs/user.output';
 import { Public } from '../../common/decorators/public.decorator';
@@ -21,11 +21,11 @@ export class AuthResolver {
     return this.authService.register(registerInput);
   }
 
-  @Mutation(() => AuthPayload)
+  @Mutation(() => LoginOutput)
   @Public()
   async login(
     @Args('loginInput') loginInput: LoginInput,
-  ): Promise<AuthPayload> {
+  ): Promise<LoginOutput> {
     return this.authService.login(loginInput);
   }
 
@@ -38,12 +38,12 @@ export class AuthResolver {
     return this.authService.logout(refreshToken);
   }
 
-  @Mutation(() => AuthPayload)
+  @Mutation(() => LoginOutput)
   @Public()
   @UseGuards(RefreshTokenGuard)
   async refreshToken(
     @Args('refreshToken', { type: () => String }) refreshToken: string,
-  ): Promise<AuthPayload> {
+  ): Promise<LoginOutput> {
     return this.authService.refreshToken(refreshToken);
   }
 }
