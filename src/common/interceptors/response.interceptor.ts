@@ -1,34 +1,44 @@
 import {
   Injectable,
-  NestInterceptor,
-  ExecutionContext,
-  CallHandler,
+  type NestInterceptor,
+  type ExecutionContext,
+  type CallHandler,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { Observable } from 'rxjs';
+import type { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { StandardResponse } from '../interfaces/response.interface';
+
+type InterceptorResponse<T> = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: T;
+  timestamp: string;
+  path?: string;
+};
 
 @Injectable()
 export class ResponseInterceptor<T>
-  implements NestInterceptor<T, StandardResponse<T>>
+  implements NestInterceptor<T, InterceptorResponse<T>>
 {
   intercept(
     context: ExecutionContext,
-    next: CallHandler,
-  ): Observable<StandardResponse<T>> {
+    next: CallHandler<T>,
+  ): Observable<InterceptorResponse<T>> {
     const gqlContext = GqlExecutionContext.create(context);
     const info = gqlContext.getInfo();
 
     return next.handle().pipe(
-      map((data) => ({
-        success: true,
-        statusCode: 200,
-        message: 'Request successful',
-        data,
-        timestamp: new Date().toISOString(),
-        path: info?.fieldName,
-      })),
+      map(
+        (data): InterceptorResponse<T> => ({
+          success: true,
+          statusCode: 200,
+          message: 'Request successful',
+          data,
+          timestamp: new Date().toISOString(),
+          path: info?.fieldName,
+        }),
+      ),
     );
   }
 }

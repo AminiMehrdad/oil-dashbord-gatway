@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateAuthInput } from './inputs/create-auth.input';
+import { CreateTokenInput } from './inputs/crreatetoken.input';
 import {
   AuthRefreshToken,
   AuthRefreshTokenDocument,
@@ -14,11 +14,11 @@ export class AuthRepository {
     private readonly authModel: Model<AuthRefreshTokenDocument>,
   ) {}
 
-  async create(input: CreateAuthInput): Promise<AuthRefreshTokenDocument> {
+  async create(input: CreateTokenInput): Promise<AuthRefreshTokenDocument> {
     return this.authModel.create(input);
   }
 
-  async upsertActiveToken(input: CreateAuthInput): Promise<AuthRefreshTokenDocument> {
+  async upsertActiveToken(input: CreateTokenInput): Promise<AuthRefreshTokenDocument> {
     return this.authModel
       .findOneAndUpdate(
         { userId: input.userId, revoked: false },

@@ -53,8 +53,8 @@ export class User {
   @Prop({ trim: true })
   imageLink?: string;
 
-  @Prop({ type: String, enum: Object.values(UserRole), default: UserRole.USER })
-  role: UserRole;
+  @Prop({default: UserRole.USER })
+  role?: UserRole;
 
   createdAt?: Date;
 

@@ -28,7 +28,7 @@ export class UserOutput {
   imageLink?: string;
 
   @Field(() => UserRole)
-  role: UserRole;
+  role?: UserRole;
 
   @Field()
   createdAt: Date;

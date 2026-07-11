@@ -54,8 +54,4 @@ export class CreateUserInput {
   @IsUrl({}, { message: 'Image link must be a valid URL' })
   imageLink?: string;
 
-  @Field(() => UserRole, { nullable: true })
-  @IsOptional()
-  @IsEnum(UserRole, { message: 'Role must be one of: ADMIN, USER, MANAGER' })
-  role?: UserRole;
 }

@@ -10,7 +10,7 @@ export class AuthUser {
   email: string;
 
   @Field(() => UserRole)
-  role: UserRole;
+  role?: UserRole;
 
   @Field({ nullable: true })
   firstName?: string;
